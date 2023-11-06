@@ -22,6 +22,7 @@ set(
 
   lib/arch_spec.cpp
   lib/format_int.cpp
+  lib/fields.cpp
   lib/gen_eq.cpp
   lib/model.cpp
   lib/namespace_context.cpp

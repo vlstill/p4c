@@ -2,7 +2,7 @@
 
 #include "backends/p4tools/common/compiler/convert_hs_index.h"
 #include "backends/p4tools/common/core/target.h"
-#include "backends/p4tools/common/lib/variables.h"
+#include "backends/p4tools/common/lib/fields.h"
 #include "ir/irutils.h"
 
 namespace P4Tools {
@@ -69,35 +69,7 @@ void AbstractExecutionState::popNamespace() { namespaces = namespaces->pop(); }
 std::vector<IR::StateVariable> AbstractExecutionState::getFlatFields(
     const IR::Expression *parent, const IR::Type_StructLike *ts,
     std::vector<IR::StateVariable> *validVector) const {
-    std::vector<IR::StateVariable> flatFields;
-    for (const auto *field : ts->fields) {
-        const auto *fieldType = resolveType(field->type);
-        if (const auto *ts = fieldType->to<IR::Type_StructLike>()) {
-            auto subFields =
-                getFlatFields(new IR::Member(fieldType, parent, field->name), ts, validVector);
-            flatFields.insert(flatFields.end(), subFields.begin(), subFields.end());
-        } else if (const auto *typeStack = fieldType->to<IR::Type_Stack>()) {
-            const auto *stackElementsType = resolveType(typeStack->elementType);
-            for (size_t arrayIndex = 0; arrayIndex < typeStack->getSize(); arrayIndex++) {
-                const auto *newArr = HSIndexToMember::produceStackIndex(
-                    stackElementsType, new IR::Member(typeStack, parent, field->name), arrayIndex);
-                BUG_CHECK(stackElementsType->is<IR::Type_StructLike>(),
-                          "Try to make the flat fields for non Type_StructLike element : %1%",
-                          stackElementsType);
-                auto subFields = getFlatFields(newArr, stackElementsType->to<IR::Type_StructLike>(),
-                                               validVector);
-                flatFields.insert(flatFields.end(), subFields.begin(), subFields.end());
-            }
-        } else {
-            flatFields.push_back(new IR::Member(fieldType, parent, field->name));
-        }
-    }
-    // If we are dealing with a header we also include the validity bit in the list of
-    // fields.
-    if (validVector != nullptr && ts->is<IR::Type_Header>()) {
-        validVector->push_back(ToolsVariables::getHeaderValidity(parent));
-    }
-    return flatFields;
+    return P4Tools::getFlatFields(parent, ts, namespaces, validVector);
 }
 
 void AbstractExecutionState::initializeStructLike(const Target &target,
