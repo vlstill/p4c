@@ -43,19 +43,11 @@ const IR::IDeclaration *AbstractExecutionState::findDecl(const IR::Path *path) c
 }
 
 const IR::IDeclaration *AbstractExecutionState::findDecl(const IR::PathExpression *pathExpr) const {
-    return findDecl(pathExpr->path);
+    return namespaces->findDecl(pathExpr);
 }
 
 const IR::Type *AbstractExecutionState::resolveType(const IR::Type *type) const {
-    const auto *typeName = type->to<IR::Type_Name>();
-    // Nothing to resolve here. Just return.
-    if (typeName == nullptr) {
-        return type;
-    }
-    const auto *path = typeName->path;
-    const auto *decl = findDecl(path)->to<IR::Type_Declaration>();
-    BUG_CHECK(decl, "Not a type: %1%", path);
-    return decl;
+    return namespaces->resolveType(type);
 }
 
 const NamespaceContext *AbstractExecutionState::getNamespaceContext() const { return namespaces; }

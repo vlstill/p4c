@@ -101,6 +101,22 @@ const IR::IDeclaration *NamespaceContext::findDecl(const IR::Path *path) const {
     return outer->findDecl(path);
 }
 
+const IR::IDeclaration *NamespaceContext::findDecl(const IR::PathExpression *pathExpr) const {
+    return findDecl(pathExpr->path);
+}
+
+const IR::Type *NamespaceContext::resolveType(const IR::Type *type) const {
+    const auto *typeName = type->to<IR::Type_Name>();
+    // Nothing to resolve here. Just return.
+    if (typeName == nullptr) {
+        return type;
+    }
+    const auto *path = typeName->path;
+    const auto *decl = findDecl(path)->to<IR::Type_Declaration>();
+    BUG_CHECK(decl, "Not a type: %1%", path);
+    return decl;
+}
+
 const std::set<cstring> &NamespaceContext::getUsedNames() const {
     if (!usedNames) {
         if (this == Empty) {

@@ -40,7 +40,13 @@ class NamespaceContext {
     const NamespaceContext *pop() const;
 
     /// Looks up a declaration in this context. A BUG occurs if the declaration cannot be found.
-    const IR::IDeclaration *findDecl(const IR::Path *path) const;
+    [[nodiscard]] const IR::IDeclaration *findDecl(const IR::Path *path) const;
+
+    /// Looks up a declaration from a path expression. A BUG occurs if no declaration is found.
+    [[nodiscard]] const IR::IDeclaration *findDecl(const IR::PathExpression *pathExpr) const;
+
+    /// Resolves a Type in the current environment.
+    [[nodiscard]] const IR::Type *resolveType(const IR::Type *type) const;
 
     /// @returns all names that appear in this context and all outer contexts.
     const std::set<cstring> &getUsedNames() const;
