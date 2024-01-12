@@ -275,6 +275,8 @@ class cstring {
 
 inline bool operator==(const char *a, cstring b) { return b == a; }
 inline bool operator!=(const char *a, cstring b) { return b != a; }
+inline bool operator==(const std::string a, cstring b) { return b == a; }
+inline bool operator!=(const std::string &a, cstring b) { return b != a; }
 
 inline std::string operator+(cstring a, cstring b) {
     std::string rv(a);
