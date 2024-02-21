@@ -54,7 +54,7 @@ AutoCompileContext::AutoCompileContext(ICompileContext *context) {
     CompileContextStack::push(context);
 }
 
-AutoCompileContext::~AutoCompileContext() { CompileContextStack::pop(); }
+AutoCompileContext::~AutoCompileContext() noexcept(false) { CompileContextStack::pop(); }
 
 /* static */ BaseCompileContext &BaseCompileContext::get() {
     return CompileContextStack::top<BaseCompileContext>();
